@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Money Hub - MICN</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header> ... same header/nav as other pages ... </header>
+
+  <main>
+    <section>
+      <h2>Donate & Sponsor</h2>
+      <p>You can support MICN by donating. (Replace # with your payment link.)</p>
+      <p><a href="#" class="btn">Donate via PayPal / Mobile Money</a></p>
+    </section>
+
+    <section>
+      <h2>Buy Shares / Join Movement</h2>
+      <form id="sharesForm" action="#" method="post">
+        <label>Name<input name="name" required></label><br>
+        <label>Email<input name="email" type="email"></label><br>
+        <label>Number of shares<input name="shares" type="number" min="1" required></label><br>
+        <label>Contact method<select name="contact"><option>WhatsApp</option><option>Call</option></select></label><br>
+        <button type="submit">Request to Buy Shares</button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Marketplace - List an item or service</h2>
+      <form id="marketForm" action="#" method="post">
+        <label>Your name<input name="seller" required></label><br>
+        <label>Item / Service title<input name="title" required></label><br>
+        <label>Description<textarea name="desc" rows="3"></textarea></label><br>
+        <label>Price<input name="price" required></label><br>
+        <label>Contact (WhatsApp/phone)<input name="contactInfo"></label><br>
+        <button type="submit">List Item</button>
+      </form>
+      <p><em>Note: For public listings to work you will later need a small backend or use Google Forms / Airtable / a simple service to receive submissions.</em></p>
+    </section>
+  </main>
+
+  <footer>© 2025 MICN</footer>
+  <script src="script.js"></script>
+</body>
+</html>
