@@ -1,75 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Horizon Group</title>
-  <meta name="description" content="Horizon Group — empowering youth through investment, innovation, technology and entrepreneurship. Create • Connect • Prosper.">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horizon-Group School System</title>
+
+<style>
+body { margin:0; font-family: 'Segoe UI', sans-serif; background:#f3f4f6;}
+header { background:#1E3A8A; color:#fff; padding:15px; text-align:center; font-size:20px;}
+.container { display:flex; }
+.sidebar {
+    width:230px; background:#1E3A8A; color:#fff; height:100vh;
+}
+.sidebar h2 { text-align:center; padding:10px;}
+.sidebar button {
+    width:100%; padding:12px; border:none; background:none; color:white;
+    text-align:left; cursor:pointer;
+}
+.sidebar button:hover { background:#10B981;}
+.main { flex:1; padding:20px;}
+.card {
+    background:white; padding:15px; margin-bottom:20px;
+    border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+.btn {
+    background:#10B981; color:white; border:none;
+    padding:8px 12px; border-radius:5px; cursor:pointer;
+}
+.btn:hover { background:#059669;}
+input, select {
+    width:100%; padding:8px; margin:6px 0;
+}
+table {
+    width:100%; border-collapse:collapse; margin-top:10px;
+}
+th, td {
+    border:1px solid #ddd; padding:8px;
+}
+.modal {
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center;
+}
+.modal-content {
+    background:white; padding:20px; width:350px; border-radius:10px;
+}
+</style>
 </head>
+
 <body>
-  <header class="site-header">
-    <div class="header-inner">
-      <img class="logo" src="images/logo.png" alt="Horizon Group logo">
-      <div class="brand">
-        <h1>Horizon Group</h1>
-        <p class="slogan">Create · Connect · Prosper</p>
-      </div>
-    </div>
 
-    <!-- Banner: if you have images/banner.jpg it will show; otherwise gradient -->
-    <div class="banner">
-      <div class="banner-overlay">
-        <h2>Empowering youth through innovation, entrepreneurship and technology</h2>
-        <p>Training, resources, mentorship and market opportunities for students and young entrepreneurs.</p>
-        <a href="tutorialhub.html" class="btn">Explore Tutorials</a>
-      </div>
-    </div>
+<header>HORIZON-GROUP School Management System</header>
 
-    <nav class="main-nav">
-      <a href="index.html">Home</a>
-      <a href="entrepreneurship.html">Entrepreneurship</a>
-      <a href="computer.html">Computer Basics</a>
-      <a href="finance.html">Finance & Stock Exchange</a>
-      <a href="self.html">Self Awareness</a>
-      <a href="moneyhub.html">Money Hub</a>
-      <a href="tutorialhub.html">Tutorial Hub</a>
-    </nav>
-  </header>
+<!-- LOGIN -->
+<div class="card" id="login">
+<h3>Select Login</h3>
+<button class="btn" onclick="loadAdmin()">Admin</button>
+<button class="btn" onclick="loadTeacher()">Teacher</button>
+<button class="btn" onclick="loadParent()">Parent</button>
+</div>
 
-  <main>
-    <section id="about" class="card">
-      <h2>About Horizon Group</h2>
-      <p>Horizon Group is a youth-focused organisation driving investment, innovation and entrepreneurship across Malawi and Africa. We provide learning resources, mentorship, market access and opportunities for young creators and entrepreneurs.</p>
-    </section>
+<!-- APP -->
+<div id="app" style="display:none;">
+<div class="container">
 
-    <section id="vision" class="card">
-      <h2>Our Vision</h2>
-      <p>To empower and connect young minds to build sustainable futures through technology, creativity and entrepreneurship.</p>
+<div class="sidebar">
+<h2>Horizon</h2>
+<button onclick="showPage('dashboard')">Dashboard</button>
+<button onclick="showPage('students')">Students</button>
+<button onclick="showPage('teachers')">Teachers</button>
+<button onclick="showPage('fees')">Fees</button>
+<button onclick="showPage('results')">Results</button>
+</div>
 
-      <div class="vision-gallery">
-        <img src="images/youth1.jpg" alt="Students collaborating">
-        <img src="images/youth2.jpg" alt="Young innovators working together">
-        <img src="images/youth3.jpg" alt="Empowered youth at training">
-      </div>
-    </section>
+<div class="main">
 
-    <section id="contact" class="card">
-      <h2>Contact</h2>
-      <p>📱 WhatsApp: <a href="https://wa.me/265880681107" target="_blank" rel="noopener">+265 88 068 1107</a> &nbsp; | &nbsp; 📞 Call: <a href="tel:+265991246948">+265 99 124 6948</a></p>
-      <p>📧 <a href="mailto:millenniuminnovators@gmail.com">millenniuminnovators@gmail.com</a></p>
-      <p>📍 Blantyre, Malawi</p>
-    </section>
-  </main>
+<div id="dashboard" class="card">
+<h2>Dashboard</h2>
+<p>Total Students: <span id="totalStudents">0</span></p>
+<p>Total Fees Paid: MWK <span id="totalFees">0</span></p>
+</div>
 
-  <footer>
-    <p>Follow us: Facebook · YouTube · TikTok · Instagram · X</p>
-    <p>© <span id="year"></span> Horizon Group | Create · Connect · Prosper</p>
-  </footer>
+<div id="students" class="card" style="display:none;">
+<h2>Students</h2>
+<button class="btn" onclick="openModal()">Add Student</button>
 
-  <script>
-    // small helpers
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
+<table>
+<thead>
+<tr>
+<th>Name</th><th>Class</th><th>Balance</th><th>Actions</th>
+</tr>
+</thead>
+<tbody id="studentTable"></tbody>
+</table>
+</div>
+
+<div id="teachers" class="card" style="display:none;">
+<h2>Teachers</h2>
+<input id="teacherName" placeholder="Teacher Name">
+<button class="btn" onclick="addTeacher()">Add</button>
+<ul id="teacherList"></ul>
+</div>
+
+<div id="fees" class="card" style="display:none;">
+<h2>Fees</h2>
+<p>Select a student and pay from profile</p>
+</div>
+
+<div id="results" class="card" style="display:none;">
+<h2>Results</h2>
+<input id="studentResultName" placeholder="Student Name">
+<input id="marks" placeholder="Enter Marks">
+<button class="btn" onclick="addResult()">Add Result</button>
+<ul id="resultList"></ul>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+<div class="modal-content">
+<h3>Add Student</h3>
+<input id="name" placeholder="Name">
+<select id="class">
+<option>Standard 1</option>
+<option>Standard 2</option>
+<option>Standard 3</option>
+<option>Standard 4</option>
+<option>Standard 5</option>
+<option>Standard 6</option>
+<option>Standard 7</option>
+<option>Standard 8</option>
+</select>
+<input id="guardian" placeholder="Guardian">
+<input id="contact" placeholder="Contact">
+<button class="btn" onclick="addStudent()">Save</button>
+</div>
+</div>
+
+<script>
+
+let students = [];
+let teachers = [];
+let totalFees = 0;
+
+function loadAdmin(){
+    document.getElementById('login').style.display='none';
+    document.getElementById('app').style.display='block';
+}
+
+function loadTeacher(){ loadAdmin(); }
+function loadParent(){
+    alert("Enter Student Name & Phone (Demo Mode)");
+    loadAdmin();
+}
+
+function showPage(page){
+    document.querySelectorAll('.card').forEach(el=>el.style.display='none');
+    document.getElementById(page).style.display='block';
+}
+
+function openModal(){
+    document.getElementById('modal').style.display='flex';
+}
+
+function addStudent(){
+    let name = document.getElementById('name').value;
+    let cls = document.getElementById('class').value;
+
+    let student = {name, cls, paid:0};
+    students.push(student);
+
+    renderStudents();
+    document.getElementById('modal').style.display='none';
+}
+
+function renderStudents(){
+    let table = document.getElementById('studentTable');
+    table.innerHTML = "";
+    students.forEach((s,i)=>{
+        let balance = 100000 - s.paid;
+        table.innerHTML += `
+        <tr>
+        <td>${s.name}</td>
+        <td>${s.cls}</td>
+        <td>${balance}</td>
+        <td>
+        <button class="btn" onclick="payFees(${i})">Pay</button>
+        </td>
+        </tr>`;
+    });
+    document.getElementById('totalStudents').innerText = students.length;
+}
+
+function payFees(i){
+    let amount = prompt("Enter amount paid:");
+    students[i].paid += Number(amount);
+    totalFees += Number(amount);
+    document.getElementById('totalFees').innerText = totalFees;
+    renderStudents();
+}
+
+function addTeacher(){
+    let t = document.getElementById('teacherName').value;
+    teachers.push(t);
+    let list = document.getElementById('teacherList');
+    list.innerHTML += `<li>${t}</li>`;
+}
+
+function addResult(){
+    let name = document.getElementById('studentResultName').value;
+    let marks = document.getElementById('marks').value;
+
+    let grade = marks>=80?"A":marks>=70?"B":marks>=60?"C":marks>=50?"D":"F";
+
+    let list = document.getElementById('resultList');
+    list.innerHTML += `<li>${name} - ${marks} (${grade})</li>`;
+}
+
+</script>
+
 </body>
 </html>
