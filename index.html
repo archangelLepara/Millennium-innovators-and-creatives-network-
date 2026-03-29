@@ -1,222 +1,294 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Horizon-Group School System</title>
 
 <style>
-body { margin:0; font-family: 'Segoe UI', sans-serif; background:#f3f4f6;}
-header { background:#1E3A8A; color:#fff; padding:15px; text-align:center; font-size:20px;}
-.container { display:flex; }
-.sidebar {
-    width:230px; background:#1E3A8A; color:#fff; height:100vh;
-}
-.sidebar h2 { text-align:center; padding:10px;}
-.sidebar button {
-    width:100%; padding:12px; border:none; background:none; color:white;
-    text-align:left; cursor:pointer;
-}
-.sidebar button:hover { background:#10B981;}
-.main { flex:1; padding:20px;}
-.card {
-    background:white; padding:15px; margin-bottom:20px;
-    border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.1);
-}
-.btn {
-    background:#10B981; color:white; border:none;
-    padding:8px 12px; border-radius:5px; cursor:pointer;
-}
-.btn:hover { background:#059669;}
-input, select {
-    width:100%; padding:8px; margin:6px 0;
-}
-table {
-    width:100%; border-collapse:collapse; margin-top:10px;
-}
-th, td {
-    border:1px solid #ddd; padding:8px;
-}
-.modal {
-    position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center;
-}
-.modal-content {
-    background:white; padding:20px; width:350px; border-radius:10px;
-}
+body{font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;margin:0;background:#f3f4f6;}
+header{background:#1E3A8A;color:#fff;padding:15px;text-align:center;position:sticky;top:0;z-index:100;}
+.container{display:flex;min-height: calc(100vh - 56px);}
+.sidebar{width:220px;background:#1E3A8A;color:#fff;padding:10px;box-sizing:border-box;}
+.sidebar button{width:100%;padding:10px;border:none;background:none;color:white;text-align:left;cursor:pointer;margin-bottom:5px;}
+.sidebar button:hover{background:#10B981;}
+.main{flex:1;padding:20px;box-sizing:border-box;overflow-y:auto;}
+.card{background:white;padding:15px;border-radius:10px;margin-bottom:20px;box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);}
+.btn{background:#10B981;color:white;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;font-size:1rem;}
+.btn:disabled{background:#aaa;cursor:not-allowed;}
+input, select, button.prompt-input{width:100%;padding:8px;margin:5px 0;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;}
+.logout-btn{background:#E11D48; margin-top: 10px;}
+.flex-row {display:flex; gap: 10px; align-items:center; flex-wrap: wrap;}
 </style>
-</head>
 
+</head>
 <body>
 
-<header>HORIZON-GROUP School Management System</header>
+<header>
+  HORIZON-GROUP School Management System
+  <button id="logoutBtn" class="btn logout-btn" style="display:none; float:right; margin-top:-34px; margin-right:10px;" onclick="logout()">Logout</button>
+</header>
 
-<!-- LOGIN -->
-<div class="card" id="login">
-<h3>Select Login</h3>
-<button class="btn" onclick="loadAdmin()">Admin</button>
-<button class="btn" onclick="loadTeacher()">Teacher</button>
-<button class="btn" onclick="loadParent()">Parent</button>
+<div id="login" class="card" style="max-width:400px; margin:30px auto;">
+  <h3>Select Role</h3>
+  <button class="btn" onclick="login('admin')">Admin</button>
+  <button class="btn" onclick="login('teacher')">Teacher</button>
+  <button class="btn" onclick="parentLogin()">Parent</button>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none;">
-<div class="container">
+  <div class="container">
+    <div class="sidebar" id="menu"></div>
 
-<div class="sidebar">
-<h2>Horizon</h2>
-<button onclick="showPage('dashboard')">Dashboard</button>
-<button onclick="showPage('students')">Students</button>
-<button onclick="showPage('teachers')">Teachers</button>
-<button onclick="showPage('fees')">Fees</button>
-<button onclick="showPage('results')">Results</button>
-</div>
-
-<div class="main">
-
-<div id="dashboard" class="card">
-<h2>Dashboard</h2>
-<p>Total Students: <span id="totalStudents">0</span></p>
-<p>Total Fees Paid: MWK <span id="totalFees">0</span></p>
-</div>
-
-<div id="students" class="card" style="display:none;">
-<h2>Students</h2>
-<button class="btn" onclick="openModal()">Add Student</button>
-
-<table>
-<thead>
-<tr>
-<th>Name</th><th>Class</th><th>Balance</th><th>Actions</th>
-</tr>
-</thead>
-<tbody id="studentTable"></tbody>
-</table>
-</div>
-
-<div id="teachers" class="card" style="display:none;">
-<h2>Teachers</h2>
-<input id="teacherName" placeholder="Teacher Name">
-<button class="btn" onclick="addTeacher()">Add</button>
-<ul id="teacherList"></ul>
-</div>
-
-<div id="fees" class="card" style="display:none;">
-<h2>Fees</h2>
-<p>Select a student and pay from profile</p>
-</div>
-
-<div id="results" class="card" style="display:none;">
-<h2>Results</h2>
-<input id="studentResultName" placeholder="Student Name">
-<input id="marks" placeholder="Enter Marks">
-<button class="btn" onclick="addResult()">Add Result</button>
-<ul id="resultList"></ul>
-</div>
-
-</div>
-</div>
-</div>
-
-<!-- MODAL -->
-<div class="modal" id="modal">
-<div class="modal-content">
-<h3>Add Student</h3>
-<input id="name" placeholder="Name">
-<select id="class">
-<option>Standard 1</option>
-<option>Standard 2</option>
-<option>Standard 3</option>
-<option>Standard 4</option>
-<option>Standard 5</option>
-<option>Standard 6</option>
-<option>Standard 7</option>
-<option>Standard 8</option>
-</select>
-<input id="guardian" placeholder="Guardian">
-<input id="contact" placeholder="Contact">
-<button class="btn" onclick="addStudent()">Save</button>
-</div>
+    <div class="main">
+      <div id="content"></div>
+    </div>
+  </div>
 </div>
 
 <script>
+// DATA
+const students = [];
+let currentUser = "";
+let currentParentStudent = null;
+let otp = "";
 
-let students = [];
-let teachers = [];
-let totalFees = 0;
+// SUBJECTS
+const subjects = ["English","Chichewa","Primary Science","Agriculture","Social Studies","French","Expressive Arts","Life Skills","Bible Knowledge"];
+const MAX_FEES = 100000;
 
-function loadAdmin(){
-    document.getElementById('login').style.display='none';
-    document.getElementById('app').style.display='block';
+// LOGIN
+function login(role){
+    currentUser = role;
+    currentParentStudent = null;
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('logoutBtn').style.display = 'inline-block';
+    loadMenu();
 }
 
-function loadTeacher(){ loadAdmin(); }
-function loadParent(){
-    alert("Enter Student Name & Phone (Demo Mode)");
-    loadAdmin();
+function logout() {
+    currentUser = "";
+    currentParentStudent = null;
+    otp = "";
+    document.getElementById('login').style.display = 'block';
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('logoutBtn').style.display = 'none';
+    document.getElementById('menu').innerHTML = '';
+    document.getElementById('content').innerHTML = '';
 }
 
-function showPage(page){
-    document.querySelectorAll('.card').forEach(el=>el.style.display='none');
-    document.getElementById(page).style.display='block';
+function parentLogin(){
+    const name = prompt("Enter Student Name (case sensitive):");
+    if(!name) return alert("Student Name is required.");
+    const phone = prompt("Enter Phone Number:");
+    if(!phone) return alert("Phone Number is required.");
+
+    const studentMatch = students.find(s=>s.name === name);
+    if(!studentMatch) return alert("Student not found.");
+
+    otp = (Math.floor(1000 + Math.random()*9000)).toString();
+    // For demo purpose we show OTP in prompt. In production, send via SMS or email.
+    let enteredOtp = prompt(`Enter OTP sent to phone number.\n(For demo use: ${otp})`);
+    if(enteredOtp === otp){
+        currentUser = "parent";
+        currentParentStudent = studentMatch;
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+        loadMenu();
+        loadParent(currentParentStudent);
+    } else {
+        alert("Incorrect OTP.");
+    }
 }
 
-function openModal(){
-    document.getElementById('modal').style.display='flex';
+// MENU
+function loadMenu(){
+    const menu = document.getElementById('menu');
+    if(currentUser === "admin"){
+        menu.innerHTML=`
+          <button onclick="adminDashboard()">Dashboard</button>
+          <button onclick="studentPage()">Students</button>`;
+        adminDashboard();
+    }
+    else if(currentUser === "teacher"){
+        menu.innerHTML=`
+          <button onclick="teacherPage()">Enter Results</button>`;
+        teacherPage();
+    }
+    else if(currentUser === "parent"){
+        menu.innerHTML=`
+          <button onclick="loadParent(currentParentStudent)">Report Card</button>`;
+    }
+}
+
+// ADMIN DASHBOARD
+function adminDashboard(){
+    let html = `<div class="card">
+      <h2>Dashboard</h2>
+      <p><b>Total Students:</b> ${students.length}</p>
+    </div>`;
+    document.getElementById('content').innerHTML = html;
+}
+
+// STUDENT MANAGEMENT
+function studentPage(){
+    let html = `<div class="card">
+      <h2>Students</h2>
+      <button class="btn" onclick="addStudent()">Add Student</button>
+      <table><thead><tr>
+          <th>Name</th><th>Class</th><th>Fees Balance</th><th>Action</th>
+        </tr></thead><tbody>`;
+    students.forEach((s,i)=>{
+        html+=`<tr>
+          <td>${s.name}</td>
+          <td>${s.class}</td>
+          <td>${MAX_FEES - s.paid}</td>
+          <td><button class="btn" style="font-size:0.8rem" onclick="viewStudent(${i})">View</button></td>
+        </tr>`;
+    });
+    html += `</tbody></table></div>`;
+    document.getElementById('content').innerHTML = html;
 }
 
 function addStudent(){
-    let name = document.getElementById('name').value;
-    let cls = document.getElementById('class').value;
+    let name = prompt("Student Name:");
+    if(!name || !name.trim()) return alert("Name is required.");
+    name = name.trim();
 
-    let student = {name, cls, paid:0};
-    students.push(student);
+    let cls = prompt("Class (Standard 1-8):");
+    if(!cls || !cls.trim()) return alert("Class is required.");
+    cls = cls.trim();
+    if(!/^[1-8]$/.test(cls)) return alert("Class must be between 1 and 8.");
 
-    renderStudents();
-    document.getElementById('modal').style.display='none';
+    // Prevent duplicate names (optional)
+    if(students.find(s => s.name === name)){
+        return alert("Student with this name already exists.");
+    }
+
+    students.push({name, class: cls, paid:0, marks:{}, history:[]});
+    studentPage();
 }
 
-function renderStudents(){
-    let table = document.getElementById('studentTable');
-    table.innerHTML = "";
-    students.forEach((s,i)=>{
-        let balance = 100000 - s.paid;
-        table.innerHTML += `
-        <tr>
-        <td>${s.name}</td>
-        <td>${s.cls}</td>
-        <td>${balance}</td>
-        <td>
-        <button class="btn" onclick="payFees(${i})">Pay</button>
-        </td>
-        </tr>`;
-    });
-    document.getElementById('totalStudents').innerText = students.length;
+// VIEW STUDENT
+function viewStudent(i){
+    const s = students[i];
+    let html = `<div class="card">
+      <h2>${s.name}</h2>
+      <p><b>Class:</b> ${s.class}</p>
+      <p><b>Fees Paid:</b> ${s.paid}</p>
+      <p><b>Balance:</b> ${MAX_FEES - s.paid}</p>
+      <button class="btn" onclick="payFees(${i})">Pay Fees</button>
+      <h3>Payment History</h3>`;
+    if(s.history.length === 0){
+        html += `<p>No payments made yet.</p>`;
+    } else {
+        s.history.forEach(h=>{
+            html+= `<p>${h.amount.toLocaleString()} on ${h.date}</p>`;
+        });
+    }
+    html += `</div>`;
+    document.getElementById('content').innerHTML = html;
 }
 
+// FEES
 function payFees(i){
-    let amount = prompt("Enter amount paid:");
-    students[i].paid += Number(amount);
-    totalFees += Number(amount);
-    document.getElementById('totalFees').innerText = totalFees;
-    renderStudents();
+    const s = students[i];
+    let amtStr = prompt("Amount to Pay:");
+    if(!amtStr) return alert("Amount is required.");
+    let amt = Number(amtStr);
+    if(isNaN(amt) || amt <=0) return alert("Please enter a valid positive amount.");
+    if(s.paid + amt > MAX_FEES) return alert(`Payment exceeds fees balance (${MAX_FEES - s.paid}).`);
+
+    const date = new Date().toLocaleDateString();
+    s.paid += amt;
+    s.history.push({amount: amt, date});
+    viewStudent(i);
 }
 
-function addTeacher(){
-    let t = document.getElementById('teacherName').value;
-    teachers.push(t);
-    let list = document.getElementById('teacherList');
-    list.innerHTML += `<li>${t}</li>`;
+// TEACHER PAGE
+function teacherPage(){
+    let html = `<div class="card">
+      <h2>Enter Results</h2>
+      <label for="studentSelect">Select Student:</label>
+      <select id="studentSelect">`;
+    students.forEach((s,i)=>{
+        html+=`<option value="${i}">${s.name}</option>`;
+    });
+    html+=`</select>`;
+
+    html += `<div style="margin-top:10px;">`;
+    subjects.forEach(sub=>{
+        html+=`<label for="${sub}">${sub}:</label><input type="number" min="0" max="100" id="${sub}" placeholder="Marks out of 100"><br>`;
+    });
+    html+=`</div>`;
+
+    html+=`<button class="btn" onclick="saveResults()" style="margin-top:10px;">Save</button></div>`;
+    document.getElementById('content').innerHTML = html;
+
+    // Clear inputs on load
+    subjects.forEach(sub=>document.getElementById(sub).value = "");
 }
 
-function addResult(){
-    let name = document.getElementById('studentResultName').value;
-    let marks = document.getElementById('marks').value;
+function grade(m){
+    if(m >= 80) return "A";
+    if(m >= 70) return "B";
+    if(m >= 60) return "C";
+    if(m >= 50) return "D";
+    return "F";
+}
 
-    let grade = marks>=80?"A":marks>=70?"B":marks>=60?"C":marks>=50?"D":"F";
+function saveResults(){
+    let i = document.getElementById("studentSelect").value;
+    if(i === "") return alert("Select a student.");
+    let total = 0;
+    let invalidInput = false;
 
-    let list = document.getElementById('resultList');
-    list.innerHTML += `<li>${name} - ${marks} (${grade})</li>`;
+    subjects.forEach(sub=>{
+        let input = document.getElementById(sub);
+        let m = Number(input.value);
+        if(isNaN(m) || m < 0 || m > 100){
+            invalidInput = true;
+            input.style.borderColor = "red";
+        } else {
+            input.style.borderColor = "#ddd";
+            students[i].marks[sub] = m;
+            total += m;
+        }
+    });
+
+    if(invalidInput){
+        return alert("Please enter valid marks (0-100) for all subjects.");
+    }
+
+    students[i].avg = (total/subjects.length).toFixed(1);
+    students[i].grade = grade(students[i].avg);
+
+    alert("Results Saved!");
+}
+
+// PARENT VIEW
+function loadParent(student){
+    if(!student) {
+        document.getElementById('content').innerHTML = `<div class="card"><p>Student data not loaded.</p></div>`;
+        return;
+    }
+
+    let html = `<div class="card">
+      <h2>${student.name} Report Card</h2>
+      <table><thead><tr><th>Subject</th><th>Marks</th></tr></thead><tbody>`;
+
+    subjects.forEach(sub=>{
+        html+=`<tr><td>${sub}</td><td>${(typeof student.marks[sub] === "number") ? student.marks[sub] : '-'}</td></tr>`;
+    });
+
+    html+=`</tbody></table>
+      <p><b>Average:</b> ${student.avg || '-'}</p>
+      <p><b>Grade:</b> ${student.grade || '-'}</p>
+      <p><b>Fees Balance:</b> ${MAX_FEES - student.paid}</p>
+      </div>`;
+
+    document.getElementById('content').innerHTML = html;
 }
 
 </script>
